@@ -1,0 +1,178 @@
+# ─── GoReleaser Configuration — ax TUI API Client ─────────────────────────────
+# Cross-compiles statically-linked binaries for Linux, macOS, and Windows.
+#
+# Usage:
+#   goreleaser release --snapshot --clean    # Test a snapshot release
+#   goreleaser release --clean              # Full production release
+# ──────────────────────────────────────────────────────────────────────────────
+
+version: 2
+
+project_name: ax
+
+env:
+  - GO111MODULE=on
+  - CGO_ENABLED=0
+
+before:
+  hooks:
+    - go mod tidy
+    - go mod verify
+
+builds:
+  - id: ax
+    main: ./cmd/ax
+    binary: ax
+    ldflags:
+      - -s -w
+      - -X main.version={{ .Version }}
+      - -X main.commit={{ .Commit }}
+      - -X main.date={{ .Date }}
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    goarm:
+      - "7"
+    ignore:
+      - goos: windows
+        goarch: arm64
+    tags:
+      - netgo
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+
+archives:
+  - id: binary
+    formats: ["tar.gz"]
+    format_overrides:
+      - goos: windows
+        formats: ["zip"]
+    name_template: >-
+      {{ .ProjectName }}_{{ .Version }}_
+      {{- if eq .Os "darwin" }}macOS
+      {{- else }}{{ .Os }}{{ end }}_{{ .Arch }}
+    files:
+      - LICENSE
+      - README.md
+
+nfpms:
+  - id: linux-packages
+    package_name: ax
+    file_name_template: >-
+      {{ .ProjectName }}_{{ .Version }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "arm64" }}aarch64
+      {{- else }}{{ .Arch }}{{ end }}
+    vendor: Zaid Ejjo
+    homepage: https://github.com/zaidejjo/ax
+    maintainer: Zaid Ejjo <zaid@example.com>
+    description: |-
+      ax — TUI API Client
+      A lightweight, fast terminal-based HTTP client for building and
+      debugging API requests. Features a three-pane layout with live
+      response preview, xh/httpie-style syntax parsing, and persistent
+      request history.
+    license: MIT
+    formats:
+      - deb
+      - rpm
+    bindir: /usr/local/bin
+    contents:
+      - src: ./LICENSE
+        dst: /usr/share/doc/ax/LICENSE
+      - src: ./README.md
+        dst: /usr/share/doc/ax/README.md
+
+brews:
+  - name: ax
+    repository:
+      owner: zaidejjo
+      name: homebrew-tap
+      branch: main
+    directory: Formula
+    homepage: https://github.com/zaidejjo/ax
+    description: "ax — TUI API Client: a terminal-based HTTP client with xh/httpie-style syntax parsing"
+    license: MIT
+    commit_author:
+      name: goreleaserbot
+      email: bot@goreleaser.com
+    install: |
+      bin.install "ax"
+    test: |
+      system "#{bin}/ax", "--version"
+    dependencies:
+      - name: xclip
+        type: optional
+      - name: wl-copy
+        type: optional
+
+checksum:
+  name_template: "checksums.txt"
+
+snapshot:
+  name_template: "{{ .Version }}-SNAPSHOT-{{ .ShortCommit }}"
+
+changelog:
+  sort: asc
+  use: github
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^ci:"
+      - "^chore:"
+      - "README"
+  groups:
+    - title: "🚀 Features"
+      regexp: "^.*feat[(\\w)]*:+.*$"
+      order: 0
+    - title: "🐛 Bug Fixes"
+      regexp: "^.*fix[(\\w)]*:+.*$"
+      order: 1
+    - title: "🧰 Maintenance"
+      order: 2
+
+release:
+  github:
+    owner: zaidejjo
+    name: ax
+  draft: true
+  prerelease: auto
+  header: |
+    ## ax {{ .Version }} — TUI API Client
+
+    Download the latest release for your platform:
+
+    | Platform | Architecture | Format | Link |
+    |----------|-------------|--------|------|
+    | Linux | amd64 | tar.gz | `ax_{{ .Version }}_linux_amd64.tar.gz` |
+    | Linux | arm64 | tar.gz | `ax_{{ .Version }}_linux_arm64.tar.gz` |
+    | Linux | amd64 | deb | `ax_{{ .Version }}_x86_64.deb` |
+    | Linux | arm64 | deb | `ax_{{ .Version }}_aarch64.deb` |
+    | macOS | amd64 | tar.gz | `ax_{{ .Version }}_macOS_amd64.tar.gz` |
+    | macOS | arm64 | tar.gz | `ax_{{ .Version }}_macOS_arm64.tar.gz` |
+    | Windows | amd64 | zip | `ax_{{ .Version }}_windows_amd64.zip` |
+
+    ### Quick Install
+
+    **Homebrew:**
+    ```bash
+    brew install zaidejjo/tap/ax
+    ```
+
+    **Go:**
+    ```bash
+    go install github.com/zaidejjo/ax/cmd/ax@{{ .Version }}
+    ```
+
+    **Direct:**
+    Download the archive for your platform from the table above, extract, and run `./ax`.
+  footer: |
+    ---
+    *Released by GoReleaser*

@@ -1,0 +1,141 @@
+# ─── CI Pipeline — ax TUI API Client ──────────────────────────────────────────
+# Runs on every push and pull request across Linux, macOS, and Windows.
+# ──────────────────────────────────────────────────────────────────────────────
+
+name: CI
+
+on:
+  push:
+    branches: [main, master, "v*"]
+    tags: ["v*"]
+  pull_request:
+    branches: [main, master]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # ─── Lint & Test ───────────────────────────────────────────────────────────
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        go: ["1.26"]
+        include:
+          - os: ubuntu-latest
+            go: "1.26"
+
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go ${{ matrix.go }}
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go }}
+          cache: true
+
+      - name: Display Go version
+        run: go version
+
+      - name: Format check
+        run: |
+          unformatted=$(go fmt ./...)
+          if [ -n "$unformatted" ]; then
+            echo "The following files are not formatted:"
+            echo "$unformatted"
+            exit 1
+          fi
+        shell: bash
+
+      - name: Vet check
+        run: go vet ./...
+        shell: bash
+
+      - name: Run tests
+        run: go test ./... -count=1 -timeout 300s -v
+        shell: bash
+        env:
+          CGO_ENABLED: "0"
+
+      - name: Build binary
+        run: go build -ldflags="-s -w" -o ax${{ runner.os == 'Windows' && '.exe' || '' }} ./cmd/ax/
+        shell: bash
+
+      - name: Verify binary runs
+        run: ./ax${{ runner.os == 'Windows' && '.exe' || '' }} --version
+        shell: bash
+
+  # ─── GoReleaser Check ──────────────────────────────────────────────────────
+  goreleaser-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [test]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.26"
+          cache: true
+
+      - name: Install GoReleaser
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: latest
+          install-only: true
+
+      - name: Validate GoReleaser config
+        run: goreleaser check -f .goreleaser.yaml
+
+      - name: Test snapshot build
+        run: goreleaser release --snapshot --clean
+        env:
+          GORELEASER_CURRENT_TAG: v0.0.0-test
+
+  # ─── Release (tags only) ───────────────────────────────────────────────────
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: [test, goreleaser-check]
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.26"
+          cache: true
+
+      - name: Install GoReleaser
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: latest
+          install-only: true
+
+      - name: Run GoReleaser
+        run: goreleaser release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
