@@ -1,16 +1,4 @@
 <div align="center">
-  <pre>
-╔══════════════════════════════════════════╗
-║        █████  ██   ██                   ║
-║       ██   ██  ██ ██                    ║
-║       ███████   ███                     ║
-║       ██   ██  ██ ██                    ║
-║       ██   ██ ██   ██                   ║
-║                                          ║
-║     TUI API Client v2                    ║
-║     Terminal-native HTTP client          ║
-╚══════════════════════════════════════════╝
-  </pre>
   <h1>ax — TUI API Client</h1>
   <p>
     <strong>A fast, beautiful terminal-based HTTP client</strong><br>
@@ -18,8 +6,7 @@
   </p>
   <p>
     <a href="https://github.com/zaidejjo/ax/releases"><img src="https://img.shields.io/github/v/release/zaidejjo/ax?style=flat&label=release&color=7C3AED" alt="Release"></a>
-    <a href="https://github.com/zaidejjo/ax/actions"><img src="https://img.shields.io/github/actions/workflow/status/zaidejjo/ax/ci.yml?branch=main&style=flat&label=CI&color=10B981" alt="CI"></a>
-    <a href="https://go.dev"><img src="https://img.shields.io/badge/Go-1.26+-00ADD8?style=flat&logo=go&logoColor=white" alt="Go"></a>
+     <a href="https://go.dev"><img src="https://img.shields.io/badge/Go-1.26+-00ADD8?style=flat&logo=go&logoColor=white" alt="Go"></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat" alt="License"></a>
   </p>
 </div>
@@ -30,7 +17,7 @@
 replaying API requests — no GUI, no Electron, no bloat. It combines the
 polish of modern API clients with the speed and scriptability of the terminal.
 
-## ✨ Features
+## Features
 
 | Feature | Description |
 |---------|-------------|
@@ -45,7 +32,13 @@ polish of modern API clients with the speed and scriptability of the terminal.
 | **Cross-Platform** | Linux, macOS, Windows — statically linked, zero CGo |
 | **No Electron** | Single 23 MB binary, minimal memory footprint |
 
-## 🚀 Installation
+##  Installation
+
+### Arch Linux 
+
+```bash
+yay -S ax
+```
 
 ### Homebrew (macOS / Linux)
 
@@ -88,7 +81,7 @@ cd ax
 make build
 ```
 
-## 🎮 Usage
+## Use
 
 ### Launch the TUI
 
@@ -102,7 +95,7 @@ ax understands httpie/xh-style shorthand directly in the URL input:
 
 ```bash
 # Start typing in the URL field at launch:
-# Press Ctrl+R to send
+# Press Ctrl+R to send or Enter
 
 # GET localhost:8080/api/users
 #    Type: :8080/api/users
@@ -150,7 +143,7 @@ source <(ax completion zsh)
 ax completion fish > ~/.config/fish/completions/ax.fish
 ```
 
-## 🏗 Architecture
+## Architecture
 
 ```
 ax/
@@ -179,7 +172,7 @@ ax/
 [Chroma v2](https://github.com/alecthomas/chroma) ·
 [modernc.org/sqlite](https://gitlab.com/cznic/sqlite) (pure Go, zero CGo)
 
-## 🧪 Testing
+## Testing
 
 ```bash
 # Run all tests
@@ -195,7 +188,7 @@ go test ./internal/history/... -v
 
 Currently **71 tests** across the client, parser, and history packages.
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please open an issue first to discuss what you'd
 like to change.
@@ -208,10 +201,10 @@ like to change.
 
 ## 📄 License
 
-[MIT](LICENSE) © Zaid Ejjo
+[MIT](LICENSE) 
 
 ---
 
 <div align="center">
-  <sub>Built with ❤️ and Go — no JavaScript was harmed in the making of this API client</sub>
+  <sub>Built with Go and ⚡making this API client so fucking fast</sub>
 </div>
