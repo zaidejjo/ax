@@ -1,0 +1,124 @@
+{
+  "site": {
+    "title": "ax — TUI API Client",
+    "description": "A fast, beautiful terminal-based HTTP client inspired by Postman/Insomnia, powered by Bubble Tea.",
+    "url": "https://ax.pages.dev",
+    "version": "v0.1.2",
+    "tagline": "Terminal-native API client"
+  },
+
+  "brand": {
+    "name": "ax",
+    "description": "TUI API Client",
+    "byline": "Terminal-native, written in Go."
+  },
+
+  "hero": {
+    "headline": ["The API Client", "Built for Your Terminal"],
+    "subtitle": "<span class=\"inline-block font-mono text-ax-cyan\">ax</span> brings xh/httpie-style syntax parsing into a blazing-fast, interactive Terminal User Interface (TUI). Written in <span class=\"text-ax-cyan\">Go</span>, powered by <span class=\"text-ax-purple\">Bubble Tea</span>.",
+    "installCommand": "curl -sSL https://ax.pages.dev/install.sh | bash",
+    "cta": {
+      "primary": { "text": "View Installation", "href": "#installation" },
+      "secondary": { "text": "Source on GitHub", "href": "https://github.com/zaidejjo/ax" }
+    }
+  },
+
+  "github": {
+    "repo": "zaidejjo/ax",
+    "url": "https://github.com/zaidejjo/ax",
+    "releasesUrl": "https://github.com/zaidejjo/ax/releases",
+    "licenseUrl": "https://github.com/zaidejjo/ax/blob/main/LICENSE",
+    "authorUrl": "https://github.com/zaidejjo",
+    "apiUrl": "https://api.github.com/repos/zaidejjo/ax"
+  },
+
+  "features": [
+    {
+      "icon": "terminal",
+      "title": "Three-Pane TUI",
+      "description": "Sidebar, request builder, and response viewer \u2014 cycle between them with <code class=\"rounded bg-ax-dark-600/50 px-1.5 py-0.5 font-mono text-xs text-ax-cyan\">Tab</code>. Powered by <span class=\"text-ax-purple\">Bubble Tea</span> v2 for buttery-smooth terminal rendering."
+    },
+    {
+      "icon": "code",
+      "title": "xh/Httpie Syntax",
+      "description": "Intuitive single-line syntax parsing right from your prompt. Type <code class=\"rounded bg-ax-dark-600/50 px-1.5 py-0.5 font-mono text-xs text-ax-purple\">:8080/api/users name==John</code> and go."
+    },
+    {
+      "icon": "highlight",
+      "title": "Chroma Highlighting",
+      "description": "Beautiful Catppuccin Macchiato-themed JSON highlighting powered by Chroma v2. Responses are colorized and formatted for readability."
+    },
+    {
+      "icon": "clock",
+      "title": "SQLite History",
+      "description": "Every request is persisted locally via SQLite with WAL mode. Your history survives restarts \u2014 browse, reload, or delete with <code class=\"rounded bg-ax-dark-600/50 px-1.5 py-0.5 font-mono text-xs text-ax-purple\">Ctrl+D</code>."
+    },
+    {
+      "icon": "clipboard",
+      "title": "Clipboard + Copy",
+      "description": "Press <code class=\"rounded bg-ax-dark-600/50 px-1.5 py-0.5 font-mono text-xs text-ax-cyan\">Ctrl+Y</code> to copy any response body to your clipboard. Works on X11, Wayland, and macOS \u2014 zero configuration."
+    },
+    {
+      "icon": "lock",
+      "title": "Cross-Platform",
+      "description": "Linux, macOS, Windows \u2014 one statically linked binary. No CGo, no dependencies. Install via Homebrew, AUR, or download directly from GitHub Releases."
+    }
+  ],
+
+  "installation": {
+    "tabs": [
+      {
+        "id": "arch",
+        "label": "Arch Linux",
+        "badge": "AUR",
+        "description": "Available via <span class=\"text-white\">ax-cli</span> in the Arch User Repository",
+        "command": "yay -S ax-cli",
+        "note": "Also available via <code class=\"font-mono text-ax-muted\">paru -S ax-cli</code> or manual PKGBUILD install from AUR."
+      },
+      {
+        "id": "brew",
+        "label": "macOS / Linux",
+        "badge": "brew",
+        "description": "Tap our custom Homebrew formula",
+        "steps": [
+          { "prompt": "$", "command": "brew tap zaidejjo/tap" },
+          { "prompt": "$", "command": "brew install ax-cli" }
+        ]
+      },
+      {
+        "id": "standalone",
+        "label": "Standalone",
+        "badge": "bash",
+        "description": "One-liner auto-detects your OS and architecture",
+        "command": "curl -sSL https://ax.pages.dev/install.sh | bash",
+        "note": "Works on Linux, macOS. Detects your OS, architecture, and preferred package manager automatically."
+      },
+      {
+        "id": "windows",
+        "label": "PowerShell",
+        "badge": "powershell",
+        "description": "Run in PowerShell 5.1+ or PowerShell Core",
+        "command": "iwr -useb https://ax.pages.dev/install.ps1 | iex",
+        "note": "Downloads the Windows binary from GitHub Releases, extracts it, and adds it to your <code class=\"font-mono text-ax-muted\">PATH</code>."
+      }
+    ]
+  },
+
+  "scripts": {
+    "description": "Our intelligent installer automatically detects your platform and picks the right installation method. Fully open source \u2014 audit it before you pipe it.",
+    "files": {
+      "bash": {
+        "label": "install.sh (Bash)",
+        "filename": "install.sh",
+        "url": "https://ax.pages.dev/install.sh",
+        "badge": "Cross-platform detection"
+      },
+      "powershell": {
+        "label": "install.ps1 (PowerShell)",
+        "filename": "install.ps1",
+        "url": "https://ax.pages.dev/install.ps1",
+        "badge": "Windows PowerShell 5.1+"
+      }
+    }
+  }
+}

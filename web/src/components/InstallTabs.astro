@@ -1,0 +1,157 @@
+---
+import config from '../config/site.json';
+const { tabs } = config.installation;
+---
+
+<section id="installation" class="relative py-24">
+  <!-- Background -->
+  <div class="absolute inset-0 noise-bg"></div>
+  <div class="absolute top-0 left-1/2 h-px w-1/2 -translate-x-1/2 bg-gradient-to-r from-transparent via-ax-purple/30 to-transparent"></div>
+
+  <div class="relative z-10 mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+    <!-- Section Header -->
+    <div class="mx-auto mb-12 max-w-2xl text-center">
+      <span class="mb-4 inline-flex items-center gap-2 rounded-full border border-ax-dark-400/30 bg-ax-dark-800/80 px-4 py-1.5 text-xs font-medium uppercase tracking-wider text-ax-muted">
+        One Command
+      </span>
+      <h2 class="text-3xl font-bold tracking-tight sm:text-4xl">
+        Install <span class="text-gradient-cyan">ax</span> on Any Platform
+      </h2>
+      <p class="mt-4 text-ax-muted">
+        Native packages for every OS. Pick your poison.
+      </p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="overflow-hidden rounded-2xl border border-ax-dark-500/50 bg-ax-dark-900">
+      <!-- Tab Bar -->
+      <div class="flex border-b border-ax-dark-600/50 overflow-x-auto">
+        {tabs.map((tab) => (
+          <button
+            class="tab-btn flex items-center gap-2 border-b-2 px-5 py-3.5 text-sm font-medium whitespace-nowrap transition-all"
+            data-tab={tab.id}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      <!-- Tab Content -->
+      <div class="p-6">
+        {tabs.map((tab) => (
+          <div class="tab-content" data-tab-content={tab.id}>
+            <div class="mb-4 flex items-center gap-2">
+              <span class="rounded bg-ax-cyan/10 px-2 py-0.5 text-[10px] font-mono text-ax-cyan">{tab.badge}</span>
+              <span class="text-sm text-ax-muted" set:html={tab.description}></span>
+            </div>
+
+            {tab.steps ? (
+              <div class="space-y-3">
+                {tab.steps.map((step) => (
+                  <div class="group relative overflow-hidden rounded-xl border border-ax-dark-500/50 bg-ax-dark-800/80">
+                    <div class="flex items-center justify-between px-5 py-4">
+                      <div class="flex items-center gap-3">
+                        <span class="text-sm font-medium text-ax-cyan">{step.prompt}</span>
+                        <code class="font-mono text-sm text-white/90">{step.command}</code>
+                      </div>
+                      <button
+                        class="copy-btn shrink-0 flex items-center gap-1.5 rounded-lg border border-ax-dark-400/30 bg-ax-dark-700/50 px-3 py-1.5 text-xs font-medium text-ax-muted transition-all hover:border-ax-cyan/20 hover:text-ax-cyan active:scale-95"
+                        data-copy={step.command}
+                      >
+                        <svg class="copy-icon h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                        </svg>
+                        <span class="copy-text">Copy</span>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div class="group relative overflow-hidden rounded-xl border border-ax-dark-500/50 bg-ax-dark-800/80">
+                <div class="flex items-center justify-between px-5 py-4">
+                  <div class="flex items-center gap-3">
+                    <span class="text-sm font-medium text-ax-purple">$</span>
+                    <code class="font-mono text-sm text-white/90">{tab.command}</code>
+                  </div>
+                  <button
+                    class="copy-btn shrink-0 flex items-center gap-1.5 rounded-lg border border-ax-dark-400/30 bg-ax-dark-700/50 px-3 py-1.5 text-xs font-medium text-ax-muted transition-all hover:border-ax-cyan/20 hover:text-ax-cyan active:scale-95"
+                    data-copy={tab.command}
+                  >
+                    <svg class="copy-icon h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                    </svg>
+                    <span class="copy-text">Copy</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {tab.note && (
+              <p class="mt-3 text-xs text-ax-muted/60" set:html={tab.note}></p>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const tabContents = document.querySelectorAll('.tab-content');
+
+  function activateTab(tabId) {
+    tabBtns.forEach((btn) => {
+      const isActive = btn.getAttribute('data-tab') === tabId;
+      btn.classList.toggle('border-ax-cyan', isActive);
+      btn.classList.toggle('border-transparent', !isActive);
+      btn.classList.toggle('text-white', isActive);
+      btn.classList.toggle('text-ax-muted', !isActive);
+    });
+    tabContents.forEach((content) => {
+      const isMatch = content.getAttribute('data-tab-content') === tabId;
+      content.classList.toggle('hidden', !isMatch);
+      content.classList.toggle('block', isMatch);
+    });
+  }
+
+  const firstTab = tabBtns[0];
+  if (firstTab) {
+    activateTab(firstTab.getAttribute('data-tab'));
+  }
+
+  tabBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const tabId = btn.getAttribute('data-tab');
+      if (tabId) activateTab(tabId);
+    });
+  });
+
+  document.querySelectorAll('.copy-btn').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const text = btn.getAttribute('data-copy');
+      if (text) {
+        try {
+          await navigator.clipboard.writeText(text);
+          const icon = btn.querySelector('.copy-icon');
+          const textEl = btn.querySelector('.copy-text');
+          if (icon) {
+            icon.innerHTML = '<path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
+          }
+          if (textEl) textEl.textContent = 'Copied!';
+          setTimeout(() => {
+            if (icon) {
+              icon.innerHTML = '<rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>';
+            }
+            if (textEl) textEl.textContent = 'Copy';
+          }, 2000);
+        } catch (e) {
+          console.error('Copy failed:', e);
+        }
+      }
+    });
+  });
+</script>

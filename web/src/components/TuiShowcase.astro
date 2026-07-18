@@ -1,0 +1,147 @@
+<section class="relative py-24">
+  <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+    <!-- Section label -->
+    <div class="mb-8 text-center">
+      <span class="inline-flex items-center gap-2 rounded-full border border-ax-dark-400/30 bg-ax-dark-800/80 px-4 py-1.5 text-xs font-medium uppercase tracking-wider text-ax-muted">
+        <span class="h-1.5 w-1.5 rounded-full bg-ax-cyan"></span>
+        Terminal Preview
+      </span>
+    </div>
+
+    <!-- Terminal Mockup -->
+    <div class="relative overflow-hidden rounded-2xl border border-ax-dark-500/50 bg-ax-dark-900 shadow-2xl transition-all duration-500 hover:border-ax-cyan/20 hover:shadow-ax-cyan/5">
+      <!-- Terminal Title Bar -->
+      <div class="flex items-center justify-between border-b border-ax-dark-600/50 px-5 py-3">
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-1.5">
+            <div class="h-3 w-3 rounded-full bg-ax-red/70"></div>
+            <div class="h-3 w-3 rounded-full bg-ax-amber/70"></div>
+            <div class="h-3 w-3 rounded-full bg-ax-green/70"></div>
+          </div>
+          <span class="text-xs font-medium text-ax-muted/50">ax — TUI API Client</span>
+        </div>
+        <div class="hidden sm:flex items-center gap-2 text-xs text-ax-muted/40">
+          <span class="rounded bg-ax-dark-600/50 px-2 py-0.5 font-mono">Tab</span>
+          <span>cycle panes</span>
+          <span class="ml-1 rounded bg-ax-dark-600/50 px-2 py-0.5 font-mono">?</span>
+          <span>help</span>
+        </div>
+      </div>
+
+      <!-- Terminal Body: Three-Pane Layout -->
+      <div class="flex flex-col md:flex-row">
+        <!-- Sidebar Pane -->
+        <div class="w-full border-b border-ax-dark-600/50 md:w-1/4 md:border-b-0 md:border-r">
+          <div class="flex items-center justify-between border-b border-ax-dark-600/30 px-4 py-2">
+            <span class="text-xs font-semibold uppercase tracking-wider text-ax-muted/60">History</span>
+            <span class="rounded bg-ax-dark-600/60 px-1.5 py-0.5 text-[10px] font-mono text-ax-muted/40">12</span>
+          </div>
+          <div class="space-y-0.5 p-2">
+            <!-- History entries -->
+            <div class="rounded-md bg-ax-cyan/10 px-3 py-2 border-l-2 border-ax-cyan">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-medium text-white">GET /api/users</span>
+                <span class="rounded bg-ax-green/15 px-1.5 py-0.5 text-[10px] font-mono text-ax-green-bright">200</span>
+              </div>
+              <div class="mt-0.5 text-[10px] text-ax-muted/50 font-mono">localhost:8080</div>
+            </div>
+            <div class="rounded-md px-3 py-2 hover:bg-ax-dark-600/30 transition-colors">
+              <div class="flex items-center justify-between">
+                <span class="text-xs text-ax-muted">POST /api/auth/login</span>
+                <span class="rounded bg-ax-green/15 px-1.5 py-0.5 text-[10px] font-mono text-ax-green-bright">201</span>
+              </div>
+              <div class="mt-0.5 text-[10px] text-ax-muted/40 font-mono">api.example.com</div>
+            </div>
+            <div class="rounded-md px-3 py-2 hover:bg-ax-dark-600/30 transition-colors">
+              <div class="flex items-center justify-between">
+                <span class="text-xs text-ax-muted">GET /api/products</span>
+                <span class="rounded bg-ax-amber/15 px-1.5 py-0.5 text-[10px] font-mono text-ax-amber">304</span>
+              </div>
+              <div class="mt-0.5 text-[10px] text-ax-muted/40 font-mono">localhost:8080</div>
+            </div>
+            <div class="rounded-md px-3 py-2 hover:bg-ax-dark-600/30 transition-colors">
+              <div class="flex items-center justify-between">
+                <span class="text-xs text-ax-muted">DELETE /api/users/42</span>
+                <span class="rounded bg-ax-red/15 px-1.5 py-0.5 text-[10px] font-mono text-ax-red">204</span>
+              </div>
+              <div class="mt-0.5 text-[10px] text-ax-muted/40 font-mono">localhost:8080</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Content Area: Request + Response -->
+        <div class="flex flex-1 flex-col">
+          <!-- Request Pane -->
+          <div class="border-b border-ax-dark-600/30">
+            <div class="flex items-center justify-between border-b border-ax-dark-600/20 px-4 py-1.5">
+              <span class="text-xs font-semibold uppercase tracking-wider text-ax-muted/60">Request</span>
+            </div>
+            <div class="flex items-center gap-2 px-4 py-2.5">
+              <span class="rounded-md bg-ax-cyan/15 px-2.5 py-1 font-mono text-xs font-bold text-ax-cyan">GET</span>
+              <span class="font-mono text-sm text-white/80">:8080/api/users</span>
+              <span class="animate-cursor-blink inline-block h-4 w-2 bg-ax-cyan/70"></span>
+            </div>
+            <!-- Headers row -->
+            <div class="flex items-center gap-4 border-t border-ax-dark-600/20 px-4 py-1.5 text-[10px] font-mono text-ax-muted/50">
+              <span>Accept: application/json</span>
+              <span>User-Agent: ax/0.1.0</span>
+            </div>
+          </div>
+
+          <!-- Response Pane -->
+          <div>
+            <div class="flex items-center justify-between border-b border-ax-dark-600/20 px-4 py-1.5">
+              <div class="flex items-center gap-3">
+                <span class="text-xs font-semibold uppercase tracking-wider text-ax-muted/60">Response</span>
+                <span class="rounded-md bg-ax-green/15 px-2 py-0.5 font-mono text-xs font-bold text-ax-green-bright">200 OK</span>
+              </div>
+              <div class="text-[10px] text-ax-muted/40">347 bytes · 142ms</div>
+            </div>
+            <!-- JSON Response -->
+            <div class="overflow-x-auto p-4">
+              <pre class="font-mono text-xs leading-relaxed" set:html={`
+<code><span class="text-ax-muted/40">{</span>
+  <span class="text-ax-cyan">"users"</span>: <span class="text-ax-muted/40">[</span>
+    <span class="text-ax-muted/40">{</span>
+      <span class="text-ax-cyan">"id"</span>: <span class="text-ax-amber">1</span>,
+      <span class="text-ax-cyan">"name"</span>: <span class="text-ax-green-bright">"Alice Johnson"</span>,
+      <span class="text-ax-cyan">"email"</span>: <span class="text-ax-green-bright">"alice@example.com"</span>,
+      <span class="text-ax-cyan">"role"</span>: <span class="text-ax-green-bright">"admin"</span>,
+      <span class="text-ax-cyan">"active"</span>: <span class="text-ax-purple">true</span>
+    <span class="text-ax-muted/40">}</span>,
+    <span class="text-ax-muted/40">{</span>
+      <span class="text-ax-cyan">"id"</span>: <span class="text-ax-amber">2</span>,
+      <span class="text-ax-cyan">"name"</span>: <span class="text-ax-green-bright">"Bob Smith"</span>,
+      <span class="text-ax-cyan">"email"</span>: <span class="text-ax-green-bright">"bob@example.com"</span>,
+      <span class="text-ax-cyan">"role"</span>: <span class="text-ax-green-bright">"user"</span>,
+      <span class="text-ax-cyan">"active"</span>: <span class="text-ax-purple">false</span>
+    <span class="text-ax-muted/40">}</span>
+  <span class="text-ax-muted/40">]</span>,
+  <span class="text-ax-cyan">"total"</span>: <span class="text-ax-amber">2</span>,
+  <span class="text-ax-cyan">"page"</span>: <span class="text-ax-amber">1</span>,
+  <span class="text-ax-cyan">"status"</span>: <span class="text-ax-green-bright">"success"</span>
+<span class="text-ax-muted/40">}</span></code>
+              `}></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Status Bar -->
+      <div class="flex items-center justify-between border-t border-ax-dark-600/50 px-4 py-2">
+        <div class="flex items-center gap-4 text-[10px] font-mono text-ax-muted/40">
+          <span>Ctrl+R: Send</span>
+          <span>Ctrl+Y: Copy</span>
+          <span>Tab: Focus</span>
+          <span>Q: Quit</span>
+        </div>
+        <div class="flex items-center gap-2 text-[10px] text-ax-muted/30">
+          <span class="flex items-center gap-1">
+            <span class="h-1.5 w-1.5 rounded-full bg-ax-green-bright/60"></span>
+            Connected
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

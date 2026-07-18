@@ -1,0 +1,160 @@
+---
+import config from '../config/site.json';
+const { scripts, github } = config;
+---
+
+<section id="scripts" class="relative py-24">
+  <div class="absolute inset-0 noise-bg"></div>
+  <div class="absolute bottom-0 left-1/2 h-px w-1/2 -translate-x-1/2 bg-gradient-to-r from-transparent via-ax-cyan/30 to-transparent"></div>
+  <div class="absolute top-1/3 right-1/4 h-72 w-72 rounded-full bg-ax-cyan/[0.02] blur-[100px]"></div>
+
+  <div class="relative z-10 mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+    <!-- Section Header -->
+    <div class="mx-auto mb-12 max-w-2xl text-center">
+      <span class="mb-4 inline-flex items-center gap-2 rounded-full border border-ax-dark-400/30 bg-ax-dark-800/80 px-4 py-1.5 text-xs font-medium uppercase tracking-wider text-ax-muted">
+        Open Source
+      </span>
+      <h2 class="text-3xl font-bold tracking-tight sm:text-4xl">
+        The <span class="text-gradient-purple">Smart Install</span> Script
+      </h2>
+      <p class="mt-4 text-ax-muted">{scripts.description}</p>
+    </div>
+
+    <!-- Script Cards -->
+    <div class="grid gap-6 md:grid-cols-2">
+      <!-- Bash Script Card -->
+      <div class="group relative overflow-hidden rounded-2xl border border-ax-dark-500/50 bg-ax-dark-900 p-6 transition-all duration-300 hover:border-ax-cyan/30 hover:glow-cyan-sm">
+        <div class="pointer-events-none absolute -inset-px rounded-2xl bg-gradient-to-br from-ax-cyan/5 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
+        <div class="relative flex flex-col h-full">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-ax-cyan/10 ring-1 ring-ax-cyan/20">
+              <svg class="h-5 w-5 text-ax-cyan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="4 17 10 11 4 5"/>
+                <line x1="12" y1="19" x2="20" y2="19"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-semibold text-white">{scripts.files.bash.filename}</h3>
+              <p class="text-xs text-ax-muted/60">Linux & macOS</p>
+            </div>
+          </div>
+          <p class="mb-4 text-sm text-ax-muted/80 flex-1">
+            Auto-detects your OS and package manager. Installs via Homebrew on macOS,
+            AUR on Arch Linux, package manager on Debian/Fedora, or pulls the universal binary.
+          </p>
+          <div class="flex items-center gap-3">
+            <a
+              href={scripts.files.bash.url}
+              download
+              class="inline-flex items-center gap-2 rounded-lg border border-ax-cyan/20 bg-ax-cyan/10 px-4 py-2 text-sm font-medium text-ax-cyan transition-all hover:bg-ax-cyan/20 active:scale-95"
+            >
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              Download {scripts.files.bash.filename}
+            </a>
+            <button
+              class="script-copy-btn inline-flex items-center gap-1.5 rounded-lg border border-ax-dark-400/30 bg-ax-dark-700/50 px-3 py-2 text-xs font-medium text-ax-muted transition-all hover:border-ax-cyan/20 hover:text-ax-cyan active:scale-95"
+              data-script-url={scripts.files.bash.url}
+            >
+              <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+              </svg>
+              <span>Copy Script</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PowerShell Script Card -->
+      <div class="group relative overflow-hidden rounded-2xl border border-ax-dark-500/50 bg-ax-dark-900 p-6 transition-all duration-300 hover:border-ax-purple/30 hover:glow-purple-sm">
+        <div class="pointer-events-none absolute -inset-px rounded-2xl bg-gradient-to-br from-ax-purple/5 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
+        <div class="relative flex flex-col h-full">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-ax-purple/10 ring-1 ring-ax-purple/20">
+              <svg class="h-5 w-5 text-ax-purple" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M0 0h11.4v11.4H0V0zm12.6 0H24v11.4H12.6V0zM0 12.6h11.4V24H0V12.6zm12.6 0H24V24H12.6V12.6z"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-semibold text-white">{scripts.files.powershell.filename}</h3>
+              <p class="text-xs text-ax-muted/60">Windows</p>
+            </div>
+          </div>
+          <p class="mb-4 text-sm text-ax-muted/80 flex-1">
+            Downloads the latest Windows binary from GitHub Releases, extracts it, and
+            adds it to your User PATH automatically. Works in PowerShell 5.1+ and PowerShell Core.
+          </p>
+          <div class="flex items-center gap-3">
+            <a
+              href={scripts.files.powershell.url}
+              download
+              class="inline-flex items-center gap-2 rounded-lg border border-ax-purple/20 bg-ax-purple/10 px-4 py-2 text-sm font-medium text-ax-purple transition-all hover:bg-ax-purple/20 active:scale-95"
+            >
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              Download {scripts.files.powershell.filename}
+            </a>
+            <button
+              class="script-copy-btn inline-flex items-center gap-1.5 rounded-lg border border-ax-dark-400/30 bg-ax-dark-700/50 px-3 py-2 text-xs font-medium text-ax-muted transition-all hover:border-ax-cyan/20 hover:text-ax-cyan active:scale-95"
+              data-script-url={scripts.files.powershell.url}
+            >
+              <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+              </svg>
+              <span>Copy Script</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info box -->
+    <div class="mt-8 flex items-start gap-3 rounded-xl border border-ax-cyan/10 bg-ax-cyan/5 p-4">
+      <svg class="mt-0.5 h-5 w-5 shrink-0 text-ax-cyan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="16" x2="12" y2="12"/>
+        <line x1="12" y1="8" x2="12.01" y2="8"/>
+      </svg>
+      <div>
+        <p class="text-sm font-medium text-white/90">Why pipe a script?</p>
+        <p class="mt-1 text-sm text-ax-muted/70">
+          You don't have to! Every release includes standalone binaries, Homebrew formulas, AUR packages,
+          and platform-specific installers. The script is purely for convenience and is fully open source &mdash;
+          <a href={github.url} target="_blank" rel="noopener noreferrer" class="text-ax-cyan underline decoration-ax-cyan/30 underline-offset-2 hover:decoration-ax-cyan/60">read the source</a> on GitHub.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Copy script buttons - fetch the file and copy content
+  document.querySelectorAll('.script-copy-btn').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const url = btn.getAttribute('data-script-url');
+      if (!url) return;
+
+      try {
+        const res = await fetch(url);
+        const text = await res.text();
+        await navigator.clipboard.writeText(text);
+
+        const originalHtml = btn.innerHTML;
+        btn.innerHTML = '<span style="color: #34d399">&#10003; Copied!</span>';
+        setTimeout(() => {
+          btn.innerHTML = originalHtml;
+        }, 2000);
+      } catch (e) {
+        console.error('Copy failed:', e);
+      }
+    });
+  });
+</script>
