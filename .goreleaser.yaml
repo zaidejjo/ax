@@ -1,7 +1,9 @@
 version: 2
+
 before:
   hooks:
     - go mod tidy
+
 builds:
   - env:
       - CGO_ENABLED=0
@@ -17,10 +19,11 @@ builds:
       - -s -w
 
 archives:
-  - format: tar.gz
+  - formats:
+      - tar.gz
     name_template: "ax_${{ .Version }}_${{ .Os }}_${{ .Arch }}"
 
-# هاد القسم السحري اللي بحدث الـ brew تلقائياً!
+# تم تعديل الاسم من brews إلى homebrews وتعديل الهيكلية للنسخة v2
 brews:
   - name: ax-cli
     repository:
