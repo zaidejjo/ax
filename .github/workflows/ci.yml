@@ -99,7 +99,7 @@ jobs:
           install-only: true
 
       - name: Validate GoReleaser config
-        run: goreleaser check -f .goreleaser.yaml
+        run: goreleaser check -f .goreleaser.yaml --deprecated
 
       - name: Test snapshot build
         run: goreleaser release --snapshot --clean
