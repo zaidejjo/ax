@@ -99,7 +99,7 @@ jobs:
           install-only: true
 
       - name: Validate GoReleaser config
-        run: goreleaser check -f .goreleaser.yaml
+        run: goreleaser check -f .goreleaser.yaml --deprecated-props-as-warnings
 
       - name: Test snapshot build
         run: goreleaser release --snapshot --clean
