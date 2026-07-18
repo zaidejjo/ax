@@ -89,7 +89,7 @@ nfpms:
       - src: ./README.md
         dst: /usr/share/doc/ax/README.md
 
-brews:
+homebrews:
   - name: ax
     repository:
       owner: zaidejjo
@@ -116,7 +116,7 @@ checksum:
   name_template: "checksums.txt"
 
 snapshot:
-  name_template: "{{ .Version }}-SNAPSHOT-{{ .ShortCommit }}"
+  version_template: "{{ .Version }}-SNAPSHOT-{{ .ShortCommit }}"
 
 changelog:
   sort: asc
