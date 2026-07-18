@@ -1,0 +1,18 @@
+pkgbase = ax
+	pkgdesc = ax — TUI API Client: a terminal-based HTTP client with xh/httpie-style syntax parsing
+	pkgver = 0.1.0
+	pkgrel = 1
+	url = https://github.com/zaidejjo/ax
+	install =
+	arch = x86_64
+	arch = aarch64
+	license = MIT
+	depends = glibc
+	optdepends = xclip: X11 clipboard support
+	optdepends = wl-clipboard: Wayland clipboard support
+	source_x86_64 = https://github.com/zaidejjo/ax/releases/download/v0.1.0/ax_0.1.0_linux_amd64.tar.gz
+	source_aarch64 = https://github.com/zaidejjo/ax/releases/download/v0.1.0/ax_0.1.0_linux_arm64.tar.gz
+	sha256sums_x86_64 = SKIP
+	sha256sums_aarch64 = SKIP
+
+pkgname = ax
