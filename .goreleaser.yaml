@@ -89,7 +89,7 @@ nfpms:
       - src: ./README.md
         dst: /usr/share/doc/ax/README.md
 
-homebrews:
+brews:
   - name: ax
     repository:
       owner: zaidejjo
