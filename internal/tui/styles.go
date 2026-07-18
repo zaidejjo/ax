@@ -1,123 +1,132 @@
 // Package tui provides the Bubble Tea TUI for ax — a terminal-based API client.
 package tui
 
-import "charm.land/lipgloss/v2"
+import (
+	"fmt"
 
-// ─── Catppuccin Macchiato Palette ────────────────────────────────────────────
-//
-// Reference: https://github.com/catppuccin/catppuccin
-//
-//	Base      #1E2030    Surface2  #6C7086    Text      #CAD3F5
-//	Mantle    #181926    Overlay0  #8087A2    Lavender  #B7BDF8
-//	Crust     #11111B    Overlay1  #939AB7    Mauve     #C6A0F6
-//	Surface0  #363A4F    Overlay2  #A5ADCB    Blue      #8AADF4
-//	Surface1  #494D64    Subtext0  #B8C0E0    Green     #A6DA95
-//	                                  Yellow    #EED49F
-//	                                  Peach     #F5A97F
-//	                                  Red       #ED8796
-//	                                  Maroon    #EE99A0
-// ──────────────────────────────────────────────────────────────────────────────
-
-// ─── Catppuccin Macchiato Colors ─────────────────────────────────────────────
-
-var (
-	// Base and surface colors.
-	baseColor     = lipgloss.Color("#1E2030")
-	mantleColor   = lipgloss.Color("#181926")
-	crustColor    = lipgloss.Color("#11111B")
-	surface0Color = lipgloss.Color("#363A4F")
-	surface1Color = lipgloss.Color("#494D64")
-	surface2Color = lipgloss.Color("#6C7086")
-
-	// Text and overlay colors.
-	textColor     = lipgloss.Color("#CAD3F5")
-	subtext0Color = lipgloss.Color("#B8C0E0")
-	subtext1Color = lipgloss.Color("#CAD3F5")
-	overlay0Color = lipgloss.Color("#8087A2")
-	overlay1Color = lipgloss.Color("#939AB7")
-	overlay2Color = lipgloss.Color("#A5ADCB")
-
-	// Accent colors.
-	lavenderColor = lipgloss.Color("#B7BDF8") // Active borders, highlights
-	mauveColor    = lipgloss.Color("#C6A0F6") // Pane titles, primary accent
-	blueColor     = lipgloss.Color("#8AADF4") // PUT method
-	sapphireColor = lipgloss.Color("#7BD4F4") // informational
-
-	// Semantic colors.
-	greenColor  = lipgloss.Color("#A6DA95") // 2xx, GET
-	yellowColor = lipgloss.Color("#EED49F") // 3xx/4xx, POST
-	peachColor  = lipgloss.Color("#F5A97F") // subtle warnings
-	redColor    = lipgloss.Color("#ED8796") // 5xx, DELETE, errors
-	maroonColor = lipgloss.Color("#EE99A0") // alternative error
+	"charm.land/lipgloss/v2"
 )
 
-// ─── Pointers for convenience ─────────────────────────────────────────────────
+// ─── Premium Dark Palette ────────────────────────────────────────────────────
+//
+//	Base (bg):       #0A0A0B  — Pitch-black background
+//	Surface:          #141416  — Component surface
+//	Surface2:         #1C1C1F  — Elevated surface / hover
+//	Border (inactive):#3A3A40  — Subtle slate border
+//	Border (active):  #22D3EE  — Cyan glow for focused pane
+//	Accent primary:   #A855F7  — Vibrant purple (titles, primary accent)
+//	Accent secondary: #22D3EE  — Cyan (secondary accent, highlights)
+//	Text primary:     #E4E4E7  — Zinc-200 body text
+//	Text muted:       #71717A  — Zinc-500 secondary/meta text
+//	Text dim:         #52525B  — Zinc-600 status bar hints
+//
+//	HTTP methods:
+//	  GET    #22C55E  Green
+//	  POST   #3B82F6  Blue
+//	  PUT    #F59E0B  Amber
+//	  PATCH  #A855F7  Purple
+//	  DELETE #EF4444  Red
+// ──────────────────────────────────────────────────────────────────────────────
 
 var (
-	// primaryColor is the main accent for active borders.
-	primaryColor = lavenderColor
+	// Background and surface.
+	bgBase     = lipgloss.Color("#0A0A0B")
+	bgSurface  = lipgloss.Color("#141416")
+	bgSurface2 = lipgloss.Color("#1C1C1F")
 
-	// successColor is used for success states.
-	successColor = greenColor
+	// Border colors.
+	borderInactive = lipgloss.Color("#3A3A40")
+	borderActive   = lipgloss.Color("#22D3EE")
 
-	// warningColor is used for warning states.
-	warningColor = yellowColor
+	// Accent colors.
+	accentPrimary   = lipgloss.Color("#A855F7")
+	accentSecondary = lipgloss.Color("#22D3EE")
 
-	// errorColor is used for error states.
-	errorColor = redColor
+	// Text colors.
+	textPrimary = lipgloss.Color("#E4E4E7")
+	textMuted   = lipgloss.Color("#71717A")
+	textDim     = lipgloss.Color("#52525B")
 
-	// mutedColor is used for secondary text and inactive borders.
-	mutedColor = surface2Color
+	// HTTP method colors (vibrant).
+	methodGreen  = lipgloss.Color("#22C55E")
+	methodBlue   = lipgloss.Color("#3B82F6")
+	methodAmber  = lipgloss.Color("#F59E0B")
+	methodPurple = lipgloss.Color("#A855F7")
+	methodRed    = lipgloss.Color("#EF4444")
 
-	// subtleColor is used for meta information.
-	subtleColor = overlay0Color
+	// Status code colors.
+	status2xx = lipgloss.Color("#22C55E")
+	status3xx = lipgloss.Color("#3B82F6")
+	status4xx = lipgloss.Color("#F97316") // orange
+	status5xx = lipgloss.Color("#EF4444")
+
+	// Semantic aliases.
+	primaryColor = accentPrimary
+	mutedColor   = borderInactive
+	subtleColor  = textMuted
+	successColor = methodGreen
+	warningColor = methodAmber
+	errorColor   = methodRed
 )
 
 // ─── Border Styles ───────────────────────────────────────────────────────────
+//
+// Uses sharp NormalBorder (thin lines: ┌┐└┘│─) for a clean, premium feel.
+// Active pane glows with cyan border; inactive panes use subtle slate.
 
 var (
 	// ActiveBorder is used for the currently focused pane.
-	// Uses a clean Lavender thick border.
+	// Sharp thin cyan border.
 	ActiveBorder = lipgloss.NewStyle().
-			BorderStyle(lipgloss.ThickBorder()).
-			BorderForeground(lavenderColor).
+			BorderStyle(lipgloss.NormalBorder()).
+			BorderForeground(borderActive).
 			Padding(0, 1)
 
 	// InactiveBorder is used for non-focused panes.
-	// Uses a very muted Surface2 rounded border.
+	// Sharp thin slate border.
 	InactiveBorder = lipgloss.NewStyle().
-			BorderStyle(lipgloss.RoundedBorder()).
-			BorderForeground(surface2Color).
+			BorderStyle(lipgloss.NormalBorder()).
+			BorderForeground(borderInactive).
 			Padding(0, 1)
+
+	// SidebarDivider is a thin horizontal separator line between sidebar entries.
+	SidebarDivider = lipgloss.NewStyle().
+			Foreground(borderInactive).
+			Render("─")
 )
 
 // ─── Header & Footer ─────────────────────────────────────────────────────────
 
 var (
-	// HeaderStyle is minimal — bold Mauve text, no background.
+	// HeaderStyle — bold purple, no background, minimal padding.
 	HeaderStyle = lipgloss.NewStyle().
 			Bold(true).
 			Padding(0, 2).
-			Foreground(mauveColor)
+			Foreground(accentPrimary)
 
-	// FooterStyle uses muted overlay colors.
-	FooterStyle = lipgloss.NewStyle().
-			Padding(0, 2).
-			Foreground(overlay1Color)
+	// StatusBarStyle — dim text on base background, for the bottom keybinding bar.
+	StatusBarStyle = lipgloss.NewStyle().
+			Foreground(textDim).
+			Padding(0, 2)
+
+	// StatusBarDivider is the thin top border for the status bar.
+	StatusBarDivider = lipgloss.NewStyle().
+				Foreground(borderInactive).
+				Render("─")
 )
 
 // ─── Pane Title ───────────────────────────────────────────────────────────────
 
 var (
-	// PaneTitleStyle uses Mauve without bold for a cleaner look.
+	// PaneTitleStyle — bold purple pane header.
 	PaneTitleStyle = lipgloss.NewStyle().
 			Bold(true).
-			Foreground(mauveColor).
+			Foreground(accentPrimary).
 			Padding(0, 0)
 
-	// PlaceholderStyle uses muted surface2.
+	// PlaceholderStyle — muted italic for empty-state hints.
 	PlaceholderStyle = lipgloss.NewStyle().
-				Foreground(surface2Color).
+				Foreground(textMuted).
 				Italic(true)
 )
 
@@ -126,55 +135,54 @@ var (
 var (
 	LabelStyle = lipgloss.NewStyle().
 			Bold(true).
-			Foreground(overlay2Color).
+			Foreground(textMuted).
 			Width(8).
 			Align(lipgloss.Right)
 
 	InputStyle = lipgloss.NewStyle().
 			Padding(0, 0)
-
-	MethodStyle = lipgloss.NewStyle().
-			Bold(true).
-			Foreground(greenColor)
 )
 
-// MethodColor returns a style for the given HTTP method using Catppuccin colors.
+// MethodColor returns a style for the given HTTP method.
 func MethodColor(method string) lipgloss.Style {
 	switch method {
 	case "GET":
-		return lipgloss.NewStyle().Bold(true).Foreground(greenColor)
+		return lipgloss.NewStyle().Bold(true).Foreground(methodGreen)
 	case "POST":
-		return lipgloss.NewStyle().Bold(true).Foreground(yellowColor)
+		return lipgloss.NewStyle().Bold(true).Foreground(methodBlue)
 	case "PUT":
-		return lipgloss.NewStyle().Bold(true).Foreground(blueColor)
+		return lipgloss.NewStyle().Bold(true).Foreground(methodAmber)
 	case "PATCH":
-		return lipgloss.NewStyle().Bold(true).Foreground(mauveColor)
+		return lipgloss.NewStyle().Bold(true).Foreground(methodPurple)
 	case "DELETE":
-		return lipgloss.NewStyle().Bold(true).Foreground(redColor)
+		return lipgloss.NewStyle().Bold(true).Foreground(methodRed)
 	default:
-		return lipgloss.NewStyle().Bold(true).Foreground(overlay2Color)
+		return lipgloss.NewStyle().Bold(true).Foreground(textMuted)
 	}
 }
 
 // ─── Response Pane Styles ─────────────────────────────────────────────────────
 
 var (
-	Status2xxStyle = lipgloss.NewStyle().Bold(true).Foreground(greenColor)
-	Status3xxStyle = lipgloss.NewStyle().Bold(true).Foreground(yellowColor)
-	Status4xxStyle = lipgloss.NewStyle().Bold(true).Foreground(peachColor)
-	Status5xxStyle = lipgloss.NewStyle().Bold(true).Foreground(redColor)
+	Status2xxStyle = lipgloss.NewStyle().Bold(true).Foreground(status2xx)
+	Status3xxStyle = lipgloss.NewStyle().Bold(true).Foreground(status3xx)
+	Status4xxStyle = lipgloss.NewStyle().Bold(true).Foreground(status4xx)
+	Status5xxStyle = lipgloss.NewStyle().Bold(true).Foreground(status5xx)
 
-	MetaStyle    = lipgloss.NewStyle().Foreground(overlay1Color)
+	MetaStyle    = lipgloss.NewStyle().Foreground(textMuted)
 	BodyStyle    = lipgloss.NewStyle().Padding(0, 0)
-	ErrorStyle   = lipgloss.NewStyle().Foreground(redColor)
-	SuccessStyle = lipgloss.NewStyle().Foreground(greenColor)
+	ErrorStyle   = lipgloss.NewStyle().Foreground(errorColor)
+	SuccessStyle = lipgloss.NewStyle().Foreground(successColor)
+
+	// MetadataLineStyle formats the compact status | time | size line.
+	MetadataLineStyle = lipgloss.NewStyle().Foreground(textMuted)
 )
 
 // StatusStyle returns a style for the given HTTP status code.
 func StatusStyle(code int) lipgloss.Style {
 	switch {
 	case code < 200:
-		return Status2xxStyle // informational
+		return Status2xxStyle
 	case code < 300:
 		return Status2xxStyle
 	case code < 400:
@@ -191,19 +199,18 @@ func StatusStyle(code int) lipgloss.Style {
 var (
 	SidebarTitleStyle = lipgloss.NewStyle().
 				Bold(true).
-				Foreground(mauveColor).
-				Underline(true)
+				Foreground(accentPrimary)
 
 	SidebarItemStyle = lipgloss.NewStyle().
 				Padding(0, 1)
 
 	SidebarSelectedStyle = lipgloss.NewStyle().
 				Padding(0, 1).
-				Background(lavenderColor).
-				Foreground(crustColor)
+				Background(accentPrimary).
+				Foreground(lipgloss.Color("#0A0A0B"))
 
 	SidebarHelpStyle = lipgloss.NewStyle().
-				Foreground(surface2Color).
+				Foreground(textMuted).
 				Italic(true).
 				Padding(0, 1)
 )
@@ -217,4 +224,16 @@ func PaneBorder(active bool, width int) lipgloss.Style {
 		return ActiveBorder.Width(width)
 	}
 	return InactiveBorder.Width(width)
+}
+
+// formatBytes returns a human-readable byte size string (e.g., "1.2 KB").
+func formatBytes(b int64) string {
+	switch {
+	case b < 1024:
+		return fmt.Sprintf("%d B", b)
+	case b < 1024*1024:
+		return fmt.Sprintf("%.1f KB", float64(b)/1024)
+	default:
+		return fmt.Sprintf("%.1f MB", float64(b)/(1024*1024))
+	}
 }

@@ -22,14 +22,3 @@ archives:
   - formats:
       - tar.gz
     name_template: "ax_${{ .Version }}_${{ .Os }}_${{ .Arch }}"
-
-brews:
-  - name: ax-cli
-    repository:
-      owner: zaidejjo
-      name: homebrew-tap
-      token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
-    directory: Formula
-    homepage: "https://github.com/zaidejjo/ax"
-    description: "ax — TUI API Client: a terminal-based HTTP client"
-    license: "MIT"

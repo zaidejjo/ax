@@ -31,7 +31,7 @@ type sidebarDelegate struct {
 	width int // set on each render to truncate URLs properly
 }
 
-func (d sidebarDelegate) Height() int                             { return 1 }
+func (d sidebarDelegate) Height() int                             { return 2 } // entry + divider
 func (d sidebarDelegate) Spacing() int                            { return 0 }
 func (d sidebarDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
 
@@ -54,7 +54,7 @@ func (d sidebarDelegate) Render(w io.Writer, m list.Model, index int, item list.
 	statusStr := fmt.Sprintf("%d", entry.Status)
 	styledStatus := StatusStyle(entry.Status).Render(statusStr)
 
-	// Build the line.
+	// Build the content line.
 	var line string
 	if index == m.Index() {
 		// Selected item: show with a pointer and highlight.
@@ -68,6 +68,21 @@ func (d sidebarDelegate) Render(w io.Writer, m list.Model, index int, item list.
 	}
 
 	fmt.Fprint(w, line)
+
+	// Thin separator line between entries (not after the last one).
+	if index < len(m.Items())-1 {
+		// Build a full-width divider line.
+		fillWidth := d.width
+		if fillWidth < 1 {
+			fillWidth = 1
+		}
+		dividerLine := ""
+		for i := 0; i < fillWidth; i++ {
+			dividerLine += "─"
+		}
+		styledDivider := lipgloss.NewStyle().Foreground(borderInactive).Render(dividerLine)
+		fmt.Fprint(w, "\n"+styledDivider)
+	}
 }
 
 // ─── Sidebar Pane ────────────────────────────────────────────────────────────

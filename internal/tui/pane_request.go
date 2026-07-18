@@ -94,7 +94,7 @@ func (p requestPane) View(width, height int) string {
 	label := LabelStyle.Render("Method")
 
 	cycleHint := lipgloss.NewStyle().
-		Foreground(mutedColor).
+		Foreground(subtleColor).
 		Italic(true).
 		Render("")
 
@@ -116,7 +116,7 @@ func (p requestPane) View(width, height int) string {
 
 	// ── Instructions ─────────────────────────────────────────────────────
 	hint := lipgloss.NewStyle().
-		Foreground(mutedColor).
+		Foreground(subtleColor).
 		Italic(true).
 		Padding(0, 0).
 		Render("Enter or Ctrl+R to send  •  Ctrl+P to paste  •  m to cycle method")

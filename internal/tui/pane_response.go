@@ -30,6 +30,7 @@ type responsePane struct {
 	headers    map[string][]string
 	body       string
 	duration   string
+	bodySize   int64 // raw body size in bytes
 
 	// loaded is true once a response or error has been received.
 	loaded bool
@@ -109,6 +110,7 @@ func (p *responsePane) SetResponse(resp *client.Response) {
 	p.headers = resp.Headers
 	p.body = string(resp.Body)
 	p.duration = resp.Duration.Round(time.Millisecond).String()
+	p.bodySize = resp.BodySize
 
 	p.viewport.SetContent(p.formatResponse())
 	p.viewport.GotoTop()
@@ -238,15 +240,19 @@ func (p responsePane) formatResponse() string {
 		return b.String()
 	}
 
-	// ── Full response mode — status, duration, headers, body ──────────
+	// ── Full response mode — metadata line, headers, body ─────────────
 
-	// Status line.
+	// Compact metadata line:  HTTP/1.1 200 OK  │  142ms  │  1.2 KB
 	statusColor := StatusStyle(p.statusCode)
-	b.WriteString(statusColor.Render(p.proto + " " + p.status))
+	metaStatus := statusColor.Render(p.proto + " " + p.status)
+	metaDuration := MetaStyle.Render(p.duration)
+	metaSize := MetaStyle.Render(formatBytes(p.bodySize))
+	metaLine := fmt.Sprintf("%s  │  %s  │  %s", metaStatus, metaDuration, metaSize)
+	b.WriteString(metaLine)
 	b.WriteString("\n")
 
-	// Duration.
-	b.WriteString(MetaStyle.Render(fmt.Sprintf("Duration: %s", p.duration)))
+	// Thin divider.
+	b.WriteString(MetadataLineStyle.Render(stringsRepeat("─", 40)))
 	b.WriteString("\n\n")
 
 	// Headers.

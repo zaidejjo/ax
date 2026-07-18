@@ -182,6 +182,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	// ── Terminal resize ────────────────────────────────────────────────
 	case tea.WindowSizeMsg:
+		if msg.Width < 10 || msg.Height < 3 {
+			return m, nil
+		}
 		m.ready = true
 		m.width = msg.Width
 		m.height = msg.Height
@@ -609,36 +612,59 @@ func (m model) handleEntryDeleted(msg entryDeletedMsg) (tea.Model, tea.Cmd) {
 // ─── View ────────────────────────────────────────────────────────────────────
 
 func (m model) View() tea.View {
-	if !m.ready {
+	if !m.ready || m.width < 10 || m.height < 3 {
 		return tea.NewView("ax — TUI API Client (loading...)\n")
 	}
 
 	// ── Compute layout dimensions ──────────────────────────────────────
-	bodyHeight := m.height - 2
+	const (
+		headerHeight = 1
+		statusBarH   = 1
+		borderSize   = 2 // fudge factor matching PaneBorder inner/outer delta
+	)
+
+	bodyHeight := m.height - headerHeight - statusBarH
 	if bodyHeight < 3 {
 		bodyHeight = 3
 	}
 
-	const borderSize = 2
-
+	// ── Sidebar (25%) vs Main (75%) ────────────────────────────────────
 	var sidebarWidth, mainWidth int
 	if m.sidebarHidden {
 		sidebarWidth = 0
 		mainWidth = m.width
 	} else {
-		sidebarWidth = int(float64(m.width) * 0.3)
+		sidebarWidth = int(float64(m.width) * 25 / 100)
 		mainWidth = m.width - sidebarWidth
-		if mainWidth < 20 {
-			mainWidth = 20
-		}
+		// Clamp to valid ranges.
 		if sidebarWidth < 10 {
 			sidebarWidth = 10
+			mainWidth = m.width - sidebarWidth
+		}
+		if mainWidth < 20 {
+			mainWidth = 20
+			sidebarWidth = m.width - mainWidth
+		}
+		// Final safety: if we somehow still have negative, fall back to no sidebar.
+		if sidebarWidth < 0 || mainWidth < 0 {
+			sidebarWidth = 0
+			mainWidth = m.width
 		}
 	}
 
+	// Inner dimensions for pane content (without border/padding).
+	sideInnerW := sidebarWidth - borderSize
 	mainInnerW := mainWidth - borderSize
+	if sideInnerW < 1 {
+		sideInnerW = 1
+	}
+	if mainInnerW < 1 {
+		mainInnerW = 1
+	}
 
-	reqInnerH := (bodyHeight-borderSize*2)*40/100 - borderSize
+	// Inner heights: request (35%), response (65%).
+	sideInnerH := bodyHeight - borderSize
+	reqInnerH := (bodyHeight-borderSize*2)*35/100 - borderSize
 	respInnerH := (bodyHeight - borderSize*2) - reqInnerH - borderSize*2
 	if reqInnerH < 3 {
 		reqInnerH = 3
@@ -648,40 +674,58 @@ func (m model) View() tea.View {
 	}
 
 	// ── Render each pane ───────────────────────────────────────────────
-	reqContent := m.request.View(mainInnerW, reqInnerH)
-	respContent := m.response.View(mainInnerW, respInnerH)
-	requestView := PaneBorder(m.activePane == paneRequest, mainWidth).
-		Render(reqContent)
-	responseView := PaneBorder(m.activePane == paneResponse, mainWidth).
-		Render(respContent)
+	var body string
+	if m.sidebarHidden {
+		// Single-column: request on top, response below.
+		reqContent := m.request.View(mainInnerW, reqInnerH)
+		respContent := m.response.View(mainInnerW, respInnerH)
+		requestView := PaneBorder(m.activePane == paneRequest, mainWidth).
+			Render(reqContent)
+		responseView := PaneBorder(m.activePane == paneResponse, mainWidth).
+			Render(respContent)
+		body = lipgloss.JoinVertical(lipgloss.Top, requestView, responseView)
+	} else {
+		// ── Sidebar ────────────────────────────────────────────────────
+		sideContent := m.sidebar.View(sideInnerW, sideInnerH)
+		sidebarView := PaneBorder(m.activePane == paneSidebar, sidebarWidth).
+			Render(sideContent)
 
-	// ── Assemble layout ────────────────────────────────────────────────
+		// ── Right column: request (top) + response (bottom) ────────────
+		reqContent := m.request.View(mainInnerW, reqInnerH)
+		respContent := m.response.View(mainInnerW, respInnerH)
+		requestView := PaneBorder(m.activePane == paneRequest, mainWidth).
+			Render(reqContent)
+		responseView := PaneBorder(m.activePane == paneResponse, mainWidth).
+			Render(respContent)
+
+		rightColumn := lipgloss.JoinVertical(lipgloss.Top, requestView, responseView)
+
+		body = lipgloss.JoinHorizontal(lipgloss.Top, sidebarView, rightColumn)
+	}
+
+	// ── Header ─────────────────────────────────────────────────────────
 	header := HeaderStyle.
 		Width(m.width).
 		Render(fmt.Sprintf(" ax — TUI API Client  v%s", m.Version))
 
-	var body string
-	if m.sidebarHidden {
-		body = lipgloss.JoinVertical(lipgloss.Top, requestView, responseView)
-	} else {
-		sideInnerW := sidebarWidth - borderSize
-		sideInnerH := bodyHeight - borderSize
-		sideContent := m.sidebar.View(sideInnerW, sideInnerH)
-		sidebarView := PaneBorder(m.activePane == paneSidebar, sidebarWidth).
-			Render(sideContent)
-		body = lipgloss.JoinHorizontal(
-			lipgloss.Top,
-			sidebarView,
-			lipgloss.JoinVertical(lipgloss.Top, requestView, responseView),
-		)
-	}
-
-	footer := FooterStyle.
+	// ── Status bar ─────────────────────────────────────────────────────
+	statusBarText := StatusBarStyle.
 		Width(m.width).
-		Render(m.renderFooter())
+		Render(m.renderStatusBar())
+
+	// Thin separator line above status bar.
+	separator := lipgloss.NewStyle().
+		Foreground(borderInactive).
+		Render(stringsRepeat("─", m.width))
 
 	// ── Assemble main view ────────────────────────────────────────────
-	mainView := lipgloss.JoinVertical(lipgloss.Top, header, body, footer)
+	mainView := lipgloss.JoinVertical(
+		lipgloss.Top,
+		header,
+		body,
+		separator,
+		statusBarText,
+	)
 
 	// ── Overlay help on top if visible ─────────────────────────────────
 	if m.help.Visible() {
@@ -696,19 +740,18 @@ func (m model) View() tea.View {
 	return v
 }
 
-// renderFooter builds the status bar / help text.
-func (m model) renderFooter() string {
+// renderStatusBar builds the bottom keybinding bar with dimmed shortcuts.
+func (m model) renderStatusBar() string {
 	var left, right string
 
-	// ── Toast takes priority if active and not expired ─────────────────
+	// Toast takes priority if active.
 	if m.toastText != "" && time.Now().Before(m.toastExpire) {
 		left = fmt.Sprintf(" %s", m.toastText)
 	} else if m.loading {
 		left = fmt.Sprintf(" %s  Sending request...", m.spinner.View())
-	} else if m.activePane == paneSidebar && m.sidebar.Len() > 0 {
-		left = " [Enter] Load  [Ctrl+D] Delete  [Ctrl+H] Sidebar  [?] Help  [q] Quit"
 	} else {
-		left = " [Tab] Focus  [Ctrl+R] Send  [m] Method  [Ctrl+P] Paste  [Ctrl+Y] Copy  [Ctrl+H] Sidebar  [?] Help  [q] Quit"
+		// Compact keybinding bar.
+		left = "  Ctrl+R: Send  │  Ctrl+Y: Copy  │  Tab: Focus  │  ?: Help  │  q: Quit"
 	}
 
 	methodInfo := fmt.Sprintf(" %s ", MethodColor(m.request.Method()).Render(m.request.Method()))

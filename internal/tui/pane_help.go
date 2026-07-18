@@ -37,7 +37,7 @@ func (h helpOverlay) View(screenW, screenH int) string {
 
 	// ── Box styling ────────────────────────────────────────────────────
 	boxStyle := lipgloss.NewStyle().
-		BorderStyle(lipgloss.RoundedBorder()).
+		BorderStyle(lipgloss.NormalBorder()).
 		BorderForeground(primaryColor).
 		Padding(1, 2).
 		Width(content.width + 4).
@@ -173,7 +173,7 @@ func (h helpOverlay) buildContent() helpContent {
 
 	// ── Dismiss hint ───────────────────────────────────────────────────
 	dismiss := lipgloss.NewStyle().
-		Foreground(mutedColor).
+		Foreground(subtleColor).
 		Italic(true).
 		Width(52).
 		Align(lipgloss.Center).
@@ -205,7 +205,7 @@ func helpRow(key, desc string) string {
 		Align(lipgloss.Left)
 
 	descStyle := lipgloss.NewStyle().
-		Foreground(lipgloss.Color("#E2E8F0"))
+		Foreground(textPrimary)
 
 	return fmt.Sprintf("  %s %s\n", keyStyle.Render(key), descStyle.Render(desc))
 }
