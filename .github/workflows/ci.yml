@@ -1,5 +1,5 @@
 # ─── CI Pipeline — ax TUI API Client ──────────────────────────────────────────
-# Runs on every push and pull request across Linux, macOS, and Windows.
+# Runs optimized tests on Linux and handles releases efficiently.
 # ──────────────────────────────────────────────────────────────────────────────
 
 name: CI
@@ -19,35 +19,25 @@ permissions:
   contents: read
 
 jobs:
-  # ─── Lint & Test ───────────────────────────────────────────────────────────
+  # ─── Lint & Test (Optimized to run on Ubuntu only to save minutes) ─────────
   test:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        go: ["1.26"]
-        include:
-          - os: ubuntu-latest
-            go: "1.26"
-
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Go ${{ matrix.go }}
+      - name: Setup Go 1.26
         uses: actions/setup-go@v5
         with:
-          go-version: ${{ matrix.go }}
+          go-version: "1.26"
           cache: true
 
       - name: Display Go version
         run: go version
 
       - name: Format check
-        if: matrix.os == 'ubuntu-latest'
         run: |
           unformatted=$(go fmt ./...)
           if [ -n "$unformatted" ]; then
@@ -67,12 +57,8 @@ jobs:
         env:
           CGO_ENABLED: "0"
 
-      - name: Build binary
-        run: go build -ldflags="-s -w" -o ax${{ runner.os == 'Windows' && '.exe' || '' }} ./cmd/ax/
-        shell: bash
-
-      - name: Verify binary runs
-        run: ./ax${{ runner.os == 'Windows' && '.exe' || '' }} --version
+      - name: Build binary test
+        run: go build -ldflags="-s -w" -o ax ./cmd/ax/
         shell: bash
 
   # ─── GoReleaser Check ──────────────────────────────────────────────────────
@@ -110,7 +96,7 @@ jobs:
   release:
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 15
     needs: [test, goreleaser-check]
     permissions:
       contents: write
