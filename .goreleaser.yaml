@@ -23,7 +23,6 @@ archives:
       - tar.gz
     name_template: "ax_${{ .Version }}_${{ .Os }}_${{ .Arch }}"
 
-# تم تعديل الاسم من brews إلى homebrews وتعديل الهيكلية للنسخة v2
 brews:
   - name: ax-cli
     repository:
