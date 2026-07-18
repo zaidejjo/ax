@@ -89,28 +89,28 @@ nfpms:
       - src: ./README.md
         dst: /usr/share/doc/ax/README.md
 
-brews:
-  - name: ax
-    repository:
-      owner: zaidejjo
-      name: homebrew-tap
-      branch: main
-    directory: Formula
-    homepage: https://github.com/zaidejjo/ax
-    description: "ax — TUI API Client: a terminal-based HTTP client with xh/httpie-style syntax parsing"
-    license: MIT
-    commit_author:
-      name: goreleaserbot
-      email: bot@goreleaser.com
-    install: |
-      bin.install "ax"
-    test: |
-      system "#{bin}/ax", "--version"
-    dependencies:
-      - name: xclip
-        type: optional
-      - name: wl-copy
-        type: optional
+# brews:
+#   - name: ax
+#     repository:
+#       owner: zaidejjo
+#       name: homebrew-tap
+#       branch: main
+#     directory: Formula
+#     homepage: https://github.com/zaidejjo/ax
+#     description: "ax — TUI API Client: a terminal-based HTTP client with xh/httpie-style syntax parsing"
+#     license: MIT
+#     commit_author:
+#       name: goreleaserbot
+#       email: bot@goreleaser.com
+#     install: |
+#       bin.install "ax"
+#     test: |
+#       system "#{bin}/ax", "--version"
+#     dependencies:
+#       - name: xclip
+#         type: optional
+#       - name: wl-copy
+#         type: optional
 
 checksum:
   name_template: "checksums.txt"
