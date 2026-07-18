@@ -1,8 +1,5 @@
-# ─── CI Pipeline — ax TUI API Client ──────────────────────────────────────────
-# Runs optimized tests on Linux and handles releases efficiently.
-# ──────────────────────────────────────────────────────────────────────────────
-
-name: CI
+# ─── CI/CD Pipeline — ax TUI API Client ──────────────────────────────────────
+name: CI/CD
 
 on:
   push:
@@ -16,26 +13,23 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: read
+  contents: write
+  packages: write
 
 jobs:
-  # ─── Lint & Test (Optimized to run on Ubuntu only to save minutes) ─────────
+  # 1. اختبار الكود وفحصه
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Go 1.26
+      - name: Setup Go
         uses: actions/setup-go@v5
         with:
           go-version: "1.26"
           cache: true
-
-      - name: Display Go version
-        run: go version
 
       - name: Format check
         run: |
@@ -49,24 +43,17 @@ jobs:
 
       - name: Vet check
         run: go vet ./...
-        shell: bash
 
       - name: Run tests
         run: go test ./... -count=1 -timeout 300s -v
-        shell: bash
         env:
           CGO_ENABLED: "0"
 
-      - name: Build binary test
-        run: go build -ldflags="-s -w" -o ax ./cmd/ax/
-        shell: bash
-
-  # ─── GoReleaser Check ──────────────────────────────────────────────────────
+  # 2. التأكد من إعدادات GoReleaser
   goreleaser-check:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     needs: [test]
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -92,16 +79,12 @@ jobs:
         env:
           GORELEASER_CURRENT_TAG: v0.0.0-test
 
-  # ─── Release (tags only) ───────────────────────────────────────────────────
+  # 3. بناء وإصدار الحزم (GitHub Releases & Homebrew)
   release:
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     needs: [test, goreleaser-check]
-    permissions:
-      contents: write
-      packages: write
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -114,15 +97,51 @@ jobs:
           go-version: "1.26"
           cache: true
 
-      - name: Install GoReleaser
+      - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
           version: latest
-          install-only: true
-
-      - name: Run GoReleaser
-        run: goreleaser release --clean
+          args: release --clean
         env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # التوكن التلقائي المدمج بجيت هاب
           HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+
+  # 4. تحديث مستودع الـ AUR تلقائياً بعد نجاح الـ Release
+  aur-publish:
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    needs: [release] # لن يشتغل إلا بعد نجاح خطوة الـ Release بالكامل
+    steps:
+      - name: Checkout main repository
+        uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: get_version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Setup SSH for AUR
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.AUR_SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -t ed25519 aur.archlinux.org >> ~/.ssh/known_hosts
+
+      - name: Clone and Update AUR
+        run: |
+          git clone ssh://aur@aur.archlinux.org/ax-cli.git /tmp/aur-repo
+          cd /tmp/aur-repo
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          NEW_VER="${{ steps.get_version.outputs.VERSION }}"
+          sed -i "s/^pkgver=.*/pkgver=$NEW_VER/" PKGBUILD
+          sed -i "s/^pkgrel=.*/pkgrel=1/" PKGBUILD
+          sed -i "s/pkgver = .*/pkgver = $NEW_VER/" .SRCINFO
+          sed -i "s/pkgrel = .*/pkgrel = 1/" .SRCINFO
+
+          git add PKGBUILD .SRCINFO
+          git commit -m "AUR: Bump version to $NEW_VER via CI"
+          git push origin master
