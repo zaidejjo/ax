@@ -47,6 +47,7 @@ jobs:
         run: go version
 
       - name: Format check
+        if: matrix.os == 'ubuntu-latest'
         run: |
           unformatted=$(go fmt ./...)
           if [ -n "$unformatted" ]; then
